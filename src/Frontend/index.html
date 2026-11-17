@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrderFlow</title>
+
+  <!-- Existing CSS files -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Additional layout helpers -->
+  <style>
+    [hidden] {
+      display: none !important;
+    }
+
+    .simple-page {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .simple-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .simple-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 180px auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .simple-form-grid--email {
+      grid-template-columns: minmax(240px, 480px) auto auto;
+    }
+
+    .simple-card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .simple-order-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .simple-message {
+      margin-top: 14px;
+    }
+
+    .simple-id {
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .simple-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .simple-form-grid,
+      .simple-form-grid--email {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .simple-card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-mark">OF</div>
+
+      <div class="brand-text">
+        <p class="brand-name">OrderFlow</p>
+        <p class="brand-subtitle">Order Management</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <button
+        type="button"
+        class="nav-item is-active"
+        data-page="overview">
+        <span>Overview</span>
+      </button>
+
+      <button
+        type="button"
+        class="nav-item"
+        data-page="orders">
+        <span>Orders</span>
+      </button>
+
+      <button
+        type="button"
+        class="nav-item"
+        data-page="notifications">
+        <span>Notifications</span>
+      </button>
+
+      <button
+        type="button"
+        class="nav-item"
+        data-page="reports">
+        <span>Reports</span>
+      </button>
+
+      <button
+        type="button"
+        class="nav-item"
+        data-page="monitoring">
+        <span>System Monitoring</span>
+      </button>
+
+      <button
+        type="button"
+        class="nav-item"
+        data-page="ai">
+        <span>AI Order Assistant</span>
+      </button>
+
+    </nav>
+  </aside>
+
+
+  <!-- MAIN AREA -->
+  <div class="main">
+
+    <header class="topbar">
+
+      <div class="topbar-heading">
+        <h1 id="page-title">Overview</h1>
+        <p id="page-subtitle">
+          Your order management dashboard
+        </p>
+      </div>
+
+      <div class="topbar-meta">
+        <span id="today"></span>
+      </div>
+
+    </header>
+
+
+    <main class="content simple-page">
+
+
+      <!-- OVERVIEW -->
+      <section class="page" id="page-overview">
+
+        <div class="simple-card-grid">
+
+          <div class="metric-card">
+            <p class="metric-label">Total Orders</p>
+            <p class="metric-value" id="metric-count">0</p>
+          </div>
+
+          <div class="metric-card">
+            <p class="metric-label">Total Order Value</p>
+            <p class="metric-value" id="metric-total">$0.00</p>
+          </div>
+
+          <div class="metric-card">
+            <p class="metric-label">Average Order Value</p>
+            <p class="metric-value" id="metric-average">$0.00</p>
+          </div>
+
+          <div class="metric-card">
+            <p class="metric-label">Latest Order</p>
+            <p
+              class="metric-value metric-value--sm"
+              id="metric-latest">
+              —
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <h2>Recent Orders</h2>
+
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              data-go="orders">
+              View all
+            </button>
+          </div>
+
+          <div id="recent-orders"></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ORDERS -->
+      <section
+        class="page"
+        id="page-orders"
+        hidden>
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <h2>Orders</h2>
+
+            <div class="simple-actions">
+
+              <input
+                id="order-search"
+                type="search"
+                placeholder="Search orders">
+
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="refresh-orders">
+                Refresh
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <form
+            id="create-order-form"
+            class="simple-form-grid">
+
+            <div class="field">
+
+              <label for="create-description">
+                Description
+              </label>
+
+              <input
+                id="create-description"
+                required
+                maxlength="200"
+                placeholder="Order description">
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="create-price">
+                Price
+              </label>
+
+              <input
+                id="create-price"
+                required
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00">
+
+            </div>
+
+
+            <button
+              class="btn btn-primary"
+              type="submit">
+              Create Order
+            </button>
+
+          </form>
+
+
+          <div
+            class="table-wrapper"
+            style="margin-top:24px">
+
+            <table class="orders-table">
+
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Description</th>
+                  <th>Price</th>
+                  <th>Created</th>
+                  <th>Last Modified</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody id="orders-body"></tbody>
+
+            </table>
+
+            <div
+              id="orders-state"
+              class="state-panel"
+              hidden>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- NOTIFICATIONS -->
+      <section
+        class="page"
+        id="page-notifications"
+        hidden>
+
+        <div class="panel panel--form">
+
+          <div class="panel-header">
+            <h2>Email Notifications</h2>
+          </div>
+
+          <p class="panel-description">
+            Subscribe to receive an email when an order is deleted.
+            AWS may send a confirmation email before notifications become active.
+          </p>
+
+
+          <form
+            id="notification-form"
+            class="simple-form-grid simple-form-grid--email">
+
+            <div class="field">
+
+              <label for="notification-email">
+                Email address
+              </label>
+
+              <input
+                id="notification-email"
+                type="email"
+                required
+                placeholder="you@example.com">
+
+            </div>
+
+
+            <button
+              type="submit"
+              class="btn btn-primary">
+              Subscribe
+            </button>
+
+
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="unsubscribe-button">
+              Unsubscribe
+            </button>
+
+          </form>
+
+
+          <div
+            id="notification-result"
+            class="status-banner simple-message"
+            hidden>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- REPORTS -->
+      <section
+        class="page"
+        id="page-reports"
+        hidden>
+
+        <div class="panel panel--form">
+
+          <div class="panel-header">
+            <h2>Deleted Orders Report</h2>
+          </div>
+
+          <p class="panel-description">
+            Generate a PDF report containing the deleted orders stored by the backend.
+          </p>
+
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="generate-report">
+            Generate PDF Report
+          </button>
+
+
+          <div
+            id="report-result"
+            class="simple-message">
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- SYSTEM MONITORING -->
+      <section
+        class="page"
+        id="page-monitoring"
+        hidden>
+
+        <!-- CloudWatch summary cards -->
+        <div class="simple-card-grid">
+
+          <div class="metric-card">
+
+            <p class="metric-label">
+              Today's Invocations
+            </p>
+
+            <p
+              class="metric-value"
+              id="monitoring-total">
+              —
+            </p>
+
+          </div>
+
+
+          <div class="metric-card">
+
+            <p class="metric-label">
+              Monitored Functions
+            </p>
+
+            <p
+              class="metric-value"
+              id="monitoring-functions">
+              —
+            </p>
+
+          </div>
+
+
+          <div class="metric-card">
+
+            <p class="metric-label">
+              Period
+            </p>
+
+            <p
+              class="metric-value metric-value--sm"
+              id="monitoring-period">
+              Today
+            </p>
+
+          </div>
+
+
+          <div class="metric-card">
+
+            <p class="metric-label">
+              Data Source
+            </p>
+
+            <!-- Green indicator is added by components.css -->
+            <p class="metric-value metric-value--sm monitoring-source">
+              Amazon CloudWatch
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Lambda activity -->
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h2>Lambda Activity</h2>
+
+              <p class="panel-description">
+                Live invocation metrics retrieved from Amazon CloudWatch.
+              </p>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="refresh-monitoring">
+              Refresh Metrics
+            </button>
+
+          </div>
+
+
+          <div
+            class="table-wrapper"
+            style="margin-top:24px">
+
+            <table class="orders-table">
+
+              <thead>
+                <tr>
+                  <th>Lambda Function</th>
+                  <th>Invocations Today</th>
+                </tr>
+              </thead>
+
+
+              <tbody id="monitoring-body">
+
+                <tr>
+                  <td colspan="2">
+                    Open System Monitoring to load metrics.
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+
+            <div
+              id="monitoring-state"
+              class="state-panel"
+              hidden>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- AI ORDER ASSISTANT -->
+      <section class="page" id="page-ai" hidden>
+        <div class="panel ai-load-panel">
+          <div class="panel-header">
+            <div>
+              <h2>AI Order Assistant</h2>
+              <p class="panel-description">Load an order and ask AI questions about it.</p>
+            </div>
+          </div>
+          <form id="ai-order-form" class="ai-order-loader">
+            <div class="form-field ai-order-field">
+              <label for="ai-order-id">Order ID</label>
+              <input id="ai-order-id" type="text" placeholder="Enter an Order ID" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="ai-load-order">Load Order</button>
+          </form>
+          <div id="ai-load-state" class="simple-message"></div>
+        </div>
+
+        <div id="ai-workspace" class="ai-workspace" hidden>
+          <div class="panel ai-order-card">
+            <div class="panel-header"><h2>Selected Order</h2></div>
+            <div class="ai-order-details">
+              <div><span>Order ID</span><strong id="ai-detail-id" class="simple-id">—</strong></div>
+              <div><span>Description</span><strong id="ai-detail-description">—</strong></div>
+              <div><span>Price</span><strong id="ai-detail-price">—</strong></div>
+              <div><span>Created</span><strong id="ai-detail-created">—</strong></div>
+              <div><span>Last Modified</span><strong id="ai-detail-modified">—</strong></div>
+            </div>
+          </div>
+
+          <div class="panel ai-chat-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Chat about this order</h2>
+                <p class="panel-description">The assistant uses the selected order's live DynamoDB data.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="ai-clear-chat">Clear Chat</button>
+            </div>
+            <div id="ai-chat-messages" class="ai-chat-messages" aria-live="polite">
+              <div class="ai-message ai-message--assistant">Ask me anything about this order.</div>
+            </div>
+            <form id="ai-chat-form" class="ai-chat-form">
+              <input id="ai-message" type="text" maxlength="2000" placeholder="Ask a question about this order..." autocomplete="off" required>
+              <button type="submit" class="btn btn-primary" id="ai-send">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+
+    </main>
+
+  </div>
+
+</div>
+
+
+<!-- EDIT / VIEW MODAL -->
+<div
+  id="order-modal"
+  class="modal-overlay"
+  hidden>
+
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true">
+
+    <div class="modal-header">
+
+      <h2 id="modal-title">
+        Order
+      </h2>
+
+      <button
+        type="button"
+        class="icon-button"
+        id="modal-close"
+        aria-label="Close">
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      class="modal-body"
+      id="modal-body">
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- TOASTS -->
+<div
+  id="toast-container"
+  class="toast-container">
+</div>
+
+
+<!-- Main JavaScript -->
+<script src="js/app.js?v=4"></script>
+
+</body>
+</html>

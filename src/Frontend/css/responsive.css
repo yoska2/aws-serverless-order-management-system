@@ -1,0 +1,28 @@
+@media (max-width: 1050px) {
+  .metrics-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 760px) {
+  .app-shell { display: block; }
+  .sidebar {
+    position: static;
+    width: 100%;
+    padding: 14px;
+  }
+  .sidebar-brand { padding: 4px 4px 14px; }
+  .sidebar-nav {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    overflow-x: auto;
+  }
+  .nav-item { text-align: center; white-space: nowrap; }
+  .main { width: 100%; }
+  .topbar { padding: 18px 20px; }
+  .topbar-meta { display: none; }
+  .content { padding: 22px 16px 40px; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  .sidebar-nav { grid-template-columns: repeat(2,1fr); }
+  .metrics-grid { grid-template-columns: 1fr; }
+  .panel { padding: 18px; }
+  .panel-header { align-items: flex-start; flex-direction: column; }
+}
